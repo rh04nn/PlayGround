@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#090b12" />
+  <title>La Torre del Umbral — Crónicas del cazador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="game-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="La Torre del Umbral">
+        <span class="brand-mark">✦</span><span>UMBRAL<span class="brand-sub">CRÓNICAS DEL CAZADOR</span></span>
+      </a>
+      <div class="top-center"><span class="live-dot"></span> PORTAL ESTABLE <span class="top-divider">/</span> <span id="statusText">PREPARADO PARA DESCENDER</span></div>
+      <button class="sound-button" id="soundBtn" aria-label="Activar sonido">♫ <span>SONIDO</span></button>
+    </header>
+
+    <main class="layout">
+      <aside class="left-rail">
+        <section class="hunter-card panel">
+          <div class="eyebrow">CAZADOR REGISTRADO <span class="rank-pill">RANGO E</span></div>
+          <div class="hunter-row">
+            <div class="avatar"><span>影</span><i></i></div>
+            <div><h1>Viajero<br>del Umbral</h1><p>El que vuelve de la sombra</p></div>
+          </div>
+          <div class="level-line"><span>NIVEL <b id="levelValue">01</b></span><span id="xpLabel">0 / 100 XP</span></div>
+          <div class="xp-track"><i id="xpFill"></i></div>
+          <div class="stat-grid">
+            <div><span>ATQ</span><b id="attackStat">18</b></div><div><span>DEF</span><b id="defenseStat">4</b></div><div><span>VEL</span><b id="speedStat">100</b></div>
+          </div>
+        </section>
+
+        <section class="vitals panel">
+          <div class="section-heading"><span>ESTADO VITAL</span><span class="pulse">● EN COMBATE</span></div>
+          <div class="meter-label"><span>♡ VIDA</span><b id="healthText">100 / 100</b></div>
+          <div class="meter hp"><i id="healthFill"></i></div>
+          <div class="meter-label mana-label"><span>✧ ENERGÍA</span><b id="manaText">60 / 60</b></div>
+          <div class="meter mana"><i id="manaFill"></i></div>
+        </section>
+
+        <section class="skills panel">
+          <div class="section-heading">HABILIDADES</div>
+          <div class="skill-row"><span class="skill-key">Q</span><span class="skill-icon dash-icon">➤</span><span><b>Paso sombrío</b><small>Impulso evasivo</small></span><span class="skill-cost">15 ✧</span></div>
+          <div class="skill-row"><span class="skill-key">E</span><span class="skill-icon burst-icon">✹</span><span><b>Estallido umbrío</b><small>Daño en área</small></span><span class="skill-cost">30 ✧</span></div>
+          <div class="skill-hint">Pulsa <kbd>Q</kbd> o <kbd>E</kbd> para usar</div>
+        </section>
+
+        <section class="objective panel">
+          <div class="section-heading">MISIÓN ACTUAL <span class="mission-icon">⌖</span></div>
+          <h3 id="missionTitle">La primera brecha</h3>
+          <p id="missionText">Elimina a todas las criaturas para abrir el portal al siguiente piso.</p>
+          <div class="mission-progress"><span id="killLabel">0 / 0</span><div class="mini-track"><i id="killFill"></i></div></div>
+        </section>
+
+        <div class="rail-footer"><span class="seal">✦</span><span>LA TORRE NO TIENE FIN<br><b>¿HASTA DÓNDE LLEGARÁS?</b></span></div>
+      </aside>
+
+      <section class="arena-column">
+        <div class="floor-header">
+          <div><div class="eyebrow">TORRE DEL UMBRAL <span class="floor-separator">/</span> SECTOR DESCONOCIDO</div><h2>PISO <span id="floorValue">01</span><span class="floor-total"> / 100</span></h2></div>
+          <div class="floor-meta"><span class="threat-label">NIVEL DE AMENAZA</span><div class="threat-dots" id="threatDots"></div><b id="threatText">BAJO</b></div>
+        </div>
+        <div class="arena-frame">
+          <canvas id="gameCanvas" aria-label="Arena de combate"></canvas>
+          <div class="arena-vignette"></div>
+          <div class="arena-topline"><span><i class="tiny-live"></i> BRECHA ACTIVA</span><span id="enemyCounter">RASTREANDO...</span></div>
+          <div class="boss-warning" id="bossWarning"><span>⚠</span> GUARDIÁN DEL PISO <span>⚠</span></div>
+          <div class="wave-banner" id="waveBanner"><span>OLEADA</span><b id="waveNumber">01</b><small>EL UMBRAL TE OBSERVA</small></div>
+          <div class="toast" id="toast"></div>
+          <div class="controls-hint"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVER</span><span><kbd>ESPACIO</kbd> ATACAR</span><span><kbd>Q</kbd> ESQUIVAR <kbd>E</kbd> ESTALLIDO</span></div>
+          <div class="mobile-controls" id="mobileControls">
+            <div class="dpad"><button data-dir="up">▲</button><div><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button></div></div>
+            <div class="mobile-actions"><button id="mobileAttack">ATQ</button><button id="mobileDash">Q</button><button id="mobileBurst">E</button></div>
+          </div>
+          <div class="overlay" id="startOverlay">
+            <div class="portal-rings"><i></i><i></i><i></i><span>✦</span></div>
+            <div class="overlay-kicker">UNA BRECHA HA DESPERTADO</div>
+            <h2>DESAFÍA<br><em>EL UMBRAL</em></h2>
+            <p>Cien pisos. Criaturas nacidas de la oscuridad.<br>Una sola oportunidad para ascender.</p>
+            <button class="primary-button" id="startBtn">ENTRAR A LA TORRE <span>→</span></button>
+            <small>WASD PARA MOVER · ESPACIO PARA ATACAR</small>
+          </div>
+          <div class="overlay hidden" id="upgradeOverlay">
+            <div class="overlay-kicker">PISO DESPEJADO · BOTÍN RECUPERADO</div>
+            <h2>ELIGE TU <em>MEJORA</em></h2>
+            <p>La torre se vuelve más peligrosa. Prepárate.</p>
+            <div class="upgrade-cards" id="upgradeCards"></div>
+            <button class="skip-button" id="skipUpgrade">Continuar sin mejora →</button>
+          </div>
+          <div class="overlay hidden" id="gameOverOverlay">
+            <div class="overlay-kicker">EL UMBRAL RECLAMA SU DEUDA</div>
+            <h2>LA SOMBRA<br><em>TE ALCANZÓ</em></h2>
+            <p id="gameOverText">Tu expedición terminó.</p>
+            <button class="primary-button" id="retryBtn">VOLVER A INTENTAR <span>↻</span></button>
+          </div>
+          <div class="overlay hidden" id="victoryOverlay">
+            <div class="overlay-kicker">LEYENDA DESPERTADA</div>
+            <h2>EL PISO <em>100</em><br>HA CAÍDO</h2>
+            <p>Has conquistado la Torre del Umbral. Tu nombre vivirá en las sombras.</p>
+            <button class="primary-button" id="victoryBtn">COMENZAR DE NUEVO <span>↻</span></button>
+          </div>
+        </div>
+        <div class="below-arena"><span><b>✧</b> Las sombras se fortalecen con cada piso.</span><span id="floorFlavor">“Algo se mueve en la oscuridad...”</span></div>
+      </section>
+
+      <aside class="right-rail">
+        <section class="tower-panel panel">
+          <div class="section-heading">PROGRESO DE TORRE <span class="tower-glyph">♜</span></div>
+          <div class="tower-visual"><div class="tower-glow"></div><div class="tower-shape"><i></i><i></i><i></i><i></i><i></i></div><span class="tower-star">✦</span><div class="tower-floor-marker" id="towerMarker"><span></span></div></div>
+          <div class="tower-levels"><span>100 <i>▲</i></span><span>50 <i>◆</i></span><span>01 <i>●</i></span></div>
+          <div class="tower-progress"><div id="towerProgress"></div></div>
+          <div class="tower-caption"><b id="towerFloorLabel">PISO 01</b><span id="towerPercent">1% CONQUISTADO</span></div>
+        </section>
+        <section class="bestiary panel">
+          <div class="section-heading">BESTIARIO <span id="bestiaryCount">0 REGISTROS</span></div>
+          <div class="monster-card" id="monsterCard"><div class="monster-sigil">?</div><div><b>DESCONOCIDO</b><small>Encuentra una criatura</small></div><span class="monster-status">—</span></div>
+          <div class="monster-card locked"><div class="monster-sigil">♟</div><div><b>EL GUARDIÁN</b><small>Jefe de cada 10 pisos</small></div><span class="monster-status">BLOQ.</span></div>
+        </section>
+        <section class="log-panel panel"><div class="section-heading">REGISTRO DE CAZA <span>⌁</span></div><div class="log-list" id="logList"><p><i>01:00</i> El portal aguarda tu llegada.</p><p><i>01:00</i> Cien pisos detectados.</p></div></section>
+        <div class="right-quote">“El miedo es una sombra.<br><b>Aprende a caminar con ella.</b>”</div>
+      </aside>
+    </main>
+    <footer><span>© CRÓNICAS DEL UMBRAL</span><span>UNA AVENTURA DE CAZADORES <i>✦</i></span><span>V 1.0.0</span></footer>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
